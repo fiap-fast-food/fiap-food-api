@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: statefulset-db-fiap-food
+spec:
+  template:
+    metadata:
+      name: db-fiap-food
+      labels:
+        app: db-fiap-food
+    spec:
+      containers:
+        - name: db-fiap-food-container
+          image: postgres:14.4
+          ports:
+            - containerPort: 5432
+          envFrom:
+            - secretRef:
+                name: secret-db-fiap-food
+          volumeMounts:
+            - name: vol-db-postgres
+              mountPath: /var/lib/postgres
+      volumes:
+      - name: vol-db-postgres
+        persistentVolumeClaim: 
+          claimName: pvc-db-postgres
+  selector:
+    matchLabels:
+      app: db-fiap-food

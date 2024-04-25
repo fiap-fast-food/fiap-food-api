@@ -1,0 +1,21 @@
+version: "2.4"
+
+services:
+  postgres:
+    image: postgres:14.4
+    environment:
+      - POSTGRES_DB=fiap-fastfood
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=root
+    command: postgres
+    ports:
+      - "5432:5432"
+      
+      
+  web:
+    build: .
+    restart: unless-stopped
+    ports:
+      - "8080:8080"  
+    links:
+     - postgres

@@ -1,0 +1,18 @@
+Build Image
+
+
+docker logout
+docker login
+docker build -t "Nome do projeto" .
+docker tag "Nome do projeto" "repositorio-nome"/"Nome do projeto":vx.x
+docker push  masterdaweb/mw-cloud:mw-cloud
+
+
+
+//
+
+docker logout
+docker login
+docker build -t fiap-food .
+docker tag fiap-food updateconsultoria/fiap-food:v2.0
+docker push updateconsultoria/fiap-food:v2.0
