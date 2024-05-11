@@ -35,7 +35,7 @@ jobs:
 
     - run: aws sts get-caller-identity
 
-    - run: aws eks update-kubeconfig --region us-east-2 update-kubeconfig --name fiap-food-api
+    - run: aws eks --region us-east-2 update-kubeconfig --name fiap-food-api
     
     - run: kubectl get svc
 
