@@ -21,7 +21,7 @@ jobs:
     - run: git clone https://github.com/fiap-fast-food/k8s-terraform.git
 
     - name: HashiCorp - Setup Terraform
-      uses: hashicorp/setup-terraform@v2.03
+      uses: hashicorp/setup-terraform@v2.0.3
       
     - run: terraform -chdir=k8s-terraform/env/Homolog init
 
