@@ -9,9 +9,10 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class ProductMapper {
-    private ModelMapper modelMapper;
+    private final ModelMapper modelMapper;
     PropertyMap<ProductRequest, ProductEntity> skipModifiedFieldsMap = new PropertyMap<>() {
         protected void configure() {
+            // TODO document why this method is empty
         }
     };
     public ProductMapper(ModelMapper modelMapper) {
@@ -20,18 +21,15 @@ public class ProductMapper {
     }
     public ProductEntity toEntity(ProductRequest request) {
 
-        ProductEntity productEntity = modelMapper.map(request, ProductEntity.class);
-        return productEntity;
+        return modelMapper.map(request, ProductEntity.class);
     }
 
     public ProductRequest toRequest(ProductEntity request) {
 
-        ProductRequest productEntity = modelMapper.map(request, ProductRequest.class);
-        return productEntity;
+        return modelMapper.map(request, ProductRequest.class);
     }
     public ProductResponse toOutput(ProductEntity productEntity) {
 
-        ProductResponse productResponse = modelMapper.map(productEntity, ProductResponse.class);
-        return productResponse;
+        return modelMapper.map(productEntity, ProductResponse.class);
     }
 }

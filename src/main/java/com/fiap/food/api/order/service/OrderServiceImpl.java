@@ -18,7 +18,6 @@ import com.fiap.food.core.repository.OrderRepository;
 import com.fiap.food.enums.OrderStatus;
 import com.fiap.food.enums.StatusPaymentEnum;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -32,41 +31,30 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class OrderServiceImpl implements OrderService{
 
-    @Autowired
-    private OrderRepository orderRepository;
+    private final OrderRepository orderRepository;
 
-    @Autowired
-    private OrderMapper orderEntityMapper;
+    private final OrderMapper orderEntityMapper;
 
+    private final ProductService productService;
 
-    @Autowired
-    private ProductService productService;
+    private final CustomerService customerService;
 
-    @Autowired
-    private CustomerService customerService;
+    private final CustomerMapper customerMapper;
 
-    @Autowired
-    private CustomerMapper customerMapper;
+    private final PaymentMapper paymentEntityMapper;
 
-    @Autowired
-    private PaymentMapper paymentEntityMapper;
+    private final ProductMapper productMapper;
 
-    @Autowired
-    private ProductMapper productMapper;
-
-    @Autowired
-    private PaymentClientService paymentClientService;
+    private final PaymentClientService paymentClientService;
 
     @Override
     public List<OrderEntity> findAll() {
-        List<OrderEntity> orders = orderRepository.findOrdersOrderedByStatusAndDateTimeOrder();
-        return orders;
+        return orderRepository.findOrdersOrderedByStatusAndDateTimeOrder();
     }
 
     @Override
     public OrderEntity findByConfirmationCode(String confirmationCode) throws NotFoundException {
-        var orderEntity = orderRepository.findByConfirmationCode(confirmationCode).orElseThrow(() -> new NotFoundException("Order not found"));
-        return orderEntity;
+        return orderRepository.findByConfirmationCode(confirmationCode).orElseThrow(() -> new NotFoundException("Order not found"));
     }
 
     @Override
@@ -128,7 +116,7 @@ public class OrderServiceImpl implements OrderService{
         String statusPayment = paymentClientService.processarPagamento(paymentRequestClientDTO);
 
         payment.setStatusPayment(StatusPaymentEnum.fromString(statusPayment));
-        payment.setAmount(new BigDecimal(totalSumOrderAmount));
+        payment.setAmount(BigDecimal.valueOf(totalSumOrderAmount));
         payment.setOrder(order);
         return payment;
     }

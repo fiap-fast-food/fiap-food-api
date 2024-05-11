@@ -1,10 +1,7 @@
 package com.fiap.food.api.customer.service;
 
-import com.fiap.food.api.customer.dto.CustomerRequest;
 import com.fiap.food.core.exception.NotFoundException;
 import com.fiap.food.core.model.CustomerEntity;
-
-import java.util.Optional;
 
 public interface CustomerService {
     void insert(CustomerEntity customer);

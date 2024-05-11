@@ -9,9 +9,12 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class CategoryMapper {
-    private ModelMapper modelMapper;
+    private final ModelMapper modelMapper;
     PropertyMap<CategoryRequest, CategoryEntity> skipModifiedFieldsMap = new PropertyMap<>() {
         protected void configure() {
+           /**
+            * TODO not implemented
+            * ***/
         }
     };
     public CategoryMapper(ModelMapper modelMapper) {
@@ -20,12 +23,10 @@ public class CategoryMapper {
     }
     public CategoryEntity toEntity(CategoryRequest request) {
 
-        CategoryEntity category = modelMapper.map(request, CategoryEntity.class);
-        return category;
+        return modelMapper.map(request, CategoryEntity.class);
     }
     public CategoryResponse toOutput(CategoryEntity categoryEntity) {
 
-        CategoryResponse categoryResponse = modelMapper.map(categoryEntity, CategoryResponse.class);
-        return categoryResponse;
+        return modelMapper.map(categoryEntity, CategoryResponse.class);
     }
 }

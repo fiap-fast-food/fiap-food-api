@@ -1,20 +1,15 @@
 package com.fiap.food.api.customer.service;
 
-import com.fiap.food.api.assembler.CustomerMapper;
 import com.fiap.food.core.exception.NotFoundException;
 import com.fiap.food.core.model.CustomerEntity;
 import com.fiap.food.core.repository.CustomerRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
 public class CustomerServiceImpl implements CustomerService{
-    @Autowired
-    private CustomerRepository customerRepository;
-    @Autowired
-    private CustomerMapper customerEntityMapper;
+    private final CustomerRepository customerRepository;
     @Override
     public void insert(CustomerEntity customer) {
         customerRepository.save(customer);

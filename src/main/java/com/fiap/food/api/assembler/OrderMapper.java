@@ -12,9 +12,10 @@ import java.util.List;
 
 @Component
 public class OrderMapper {
-    private ModelMapper modelMapper;
+    private final ModelMapper modelMapper;
     PropertyMap<OrderRequest, OrderEntity> skipModifiedFieldsMap = new PropertyMap<>() {
         protected void configure() {
+            // TODO document why this method is empty
         }
     };
     public OrderMapper(ModelMapper modelMapper) {
@@ -23,13 +24,11 @@ public class OrderMapper {
     }
     public OrderEntity toEntity(OrderRequest request) {
 
-        OrderEntity orderEntity = modelMapper.map(request, OrderEntity.class);
-        return orderEntity;
+        return modelMapper.map(request, OrderEntity.class);
     }
     public OrderResponse toOutput(OrderEntity orderEntity) {
 
-        OrderResponse orderResponse = modelMapper.map(orderEntity, OrderResponse.class);
-        return orderResponse;
+        return modelMapper.map(orderEntity, OrderResponse.class);
     }
 
     public List<OrderResponse> toResponseList(List<OrderEntity> requests) {
