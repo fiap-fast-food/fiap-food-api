@@ -35,7 +35,7 @@ jobs:
 
     - run: aws sts get-caller-identity
 
-    - run: aws eks update-kubeconfig --region us-east-2 --name homolog2
+    - run: aws eks update-kubeconfig --region us-east-2 --name fiap-food-api
     
     - run: kubectl get svc
 
