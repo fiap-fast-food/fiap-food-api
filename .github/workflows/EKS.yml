@@ -35,7 +35,7 @@ jobs:
 
     - run: aws sts get-caller-identity
 
-    - run: aws eks update-kubeconfig --region us-east-2 --name fiap-food-api
+    - run: aws eks --region us-east-2 update-kubeconfig --name fiap-food-api
     
     - run: kubectl get svc
 
@@ -46,3 +46,5 @@ jobs:
     - run: kubctl create secret generic dbport --from-literal=DBPORT=${{secrets.DBPORT}}
     - run: kubctl create secret generic dbname --from-literal=DBNAME=${{secrets.DBNAME}}
     - run: kubctl create secret generic api_payment --from-literal=HOST_API_PAYMENT=${{secrets.API_PAYMENT_URL}}
+
+    - run: kubectl apply -f k8s-terraform/java.yml
