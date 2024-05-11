@@ -5,14 +5,14 @@ import com.fiap.food.api.payment.dto.PaymentResponse;
 import com.fiap.food.core.exception.NotFoundException;
 import com.fiap.food.core.model.PaymentEntity;
 import com.fiap.food.core.repository.PaymentRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 @Service
+@RequiredArgsConstructor
 public class PaymentServiceImpl implements PaymentService{
-    @Autowired
-    private PaymentRepository paymentRepository;
-    @Autowired
-    private PaymentMapper paymentEntityMapper;
+
+    private final PaymentRepository paymentRepository;
+    private final PaymentMapper paymentEntityMapper;
     @Override
     public PaymentResponse findStatusPaymentByConfirmationCodeOrder(String confirmationCode) throws NotFoundException {
         PaymentEntity byOrderConfirmationCode = paymentRepository.findByOrderConfirmationCode(confirmationCode).orElseThrow(() -> new NotFoundException("Order not found"));

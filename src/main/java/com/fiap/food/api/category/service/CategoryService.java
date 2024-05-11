@@ -4,8 +4,6 @@ import com.fiap.food.api.category.dto.CategoryRequest;
 import com.fiap.food.core.exception.NotFoundException;
 import com.fiap.food.core.model.CategoryEntity;
 
-import java.util.Optional;
-
 public interface CategoryService {
     CategoryEntity insert(CategoryRequest category);
     void update(CategoryRequest category) throws NotFoundException;

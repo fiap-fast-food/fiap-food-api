@@ -1,11 +1,9 @@
 package com.fiap.food.api.order.service;
 
-import com.fiap.food.api.order.dto.OrderRequest;
 import com.fiap.food.core.exception.NotFoundException;
 import com.fiap.food.core.model.OrderEntity;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface OrderService {
     List<OrderEntity> findAll();
