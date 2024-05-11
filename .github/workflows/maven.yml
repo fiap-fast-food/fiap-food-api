@@ -17,7 +17,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://localhost
+      SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/fiap-fastfood
       DB_PORT: 5432
       DB_NAME: fiap-fastfood
       SPRING_DATASOURCE_USERNAME: postgres
