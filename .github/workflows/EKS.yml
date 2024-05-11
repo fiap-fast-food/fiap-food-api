@@ -39,7 +39,7 @@ jobs:
     
     - run: kubectl get svc
 
-    - run: kubctl create secret generic datasource_url --from-literal=HOST=${{steps.URL.output.stdout}}
+    - run: kubctl create secret generic datasource_url --from-literal=HOST=${{steps.URL.output.stdout}}:${{secrets.DBPORT}}/${{secrets.DBNAME}}
     - run: kubctl create secret generic datasource_username --from-literal=USER=${{secrets.SPRING_DATASOURCE_USERNAME}}
     - run: kubctl create secret generic datasource_password --from-literal=PASSWORD=${{secrets.SPRING_DATASOURCE_PASSWORD}}
     - run: kubctl create secret generic datasource_driver_class_name --from-literal=DRIVER_CLASS_NAME=${{secrets.SPRING_DATASOURCE_DRIVER_CLASS_NAME}}
