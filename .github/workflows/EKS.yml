@@ -67,16 +67,16 @@ jobs:
     - run: kubectl get svc
 
     - run: kubectl delete secret datasource-url --ignore-not-found
-    - run: kubectl create secret generic datasource_url --from-literal=HOST=${{ steps.URL.outputs.stdout }}:${{secrets.DBPORT}}/${{secrets.DBNAME}}
+    - run: kubectl create secret generic datasource-url --from-literal=HOST=${{ steps.URL.outputs.stdout }}:${{secrets.DBPORT}}/${{secrets.DBNAME}}
     
     - run: kubectl delete secret datasource-username --ignore-not-found
-    - run: kubectl create secret generic datasource_username --from-literal=USER=${{secrets.SPRING_DATASOURCE_USERNAME}}
+    - run: kubectl create secret generic datasource-username --from-literal=USER=${{secrets.SPRING_DATASOURCE_USERNAME}}
     
     - run: kubectl delete secret datasource-password --ignore-not-found
-    - run: kubectl create secret generic datasource_password --from-literal=PASSWORD=${{secrets.SPRING_DATASOURCE_PASSWORD}}
+    - run: kubectl create secret generic datasource-password --from-literal=PASSWORD=${{secrets.SPRING_DATASOURCE_PASSWORD}}
     
     - run: kubectl delete secret datasource-driver-class-name --ignore-not-found
-    - run: kubectl create secret generic datasource_driver_class_name --from-literal=DRIVER_CLASS_NAME=${{secrets.SPRING_DATASOURCE_DRIVER_CLASS_NAME}}
+    - run: kubectl create secret generic datasource-driver-class-name --from-literal=DRIVER_CLASS_NAME=${{secrets.SPRING_DATASOURCE_DRIVER_CLASS_NAME}}
     
     - run: kubectl delete secret dbport --ignore-not-found
     - run: kubectl create secret generic dbport --from-literal=DBPORT=${{secrets.DBPORT}}
@@ -84,7 +84,7 @@ jobs:
     - run: kubectl delete secret dbname --ignore-not-found
     - run: kubectl create secret generic dbname --from-literal=DBNAME=${{secrets.DBNAME}}
     
-    - run: kubectl delete secret api_payment --ignore-not-found
+    - run: kubectl delete secret api-payment --ignore-not-found
     - run: kubectl create secret generic api-payment --from-literal=HOST_API_PAYMENT=${{secrets.API_PAYMENT_URL}}
 
     - run: kubectl apply -f k8s-terraform/src/java.yml
