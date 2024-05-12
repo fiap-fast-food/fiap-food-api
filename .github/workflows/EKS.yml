@@ -35,7 +35,7 @@ jobs:
 
     - run: aws sts get-caller-identity
 
-    - run: aws eks --region us-east-2 update-kubeconfig --name fiap-food-api
+    - run: aws eks --region us-east-2 update-kubeconfig --name fiap-food-api-cluster
     
     - run: kubectl get svc
 
@@ -60,6 +60,6 @@ jobs:
     - run: kubectl delete secret api_payment --ignore-not-found
     - run: kubctl create secret generic api_payment --from-literal=HOST_API_PAYMENT=${{secrets.API_PAYMENT_URL}}
 
-    - run: kubectl apply -f k8s-terraform/java.yml
+    - run: kubectl apply -f k8s-terraform/src/java.yml
 
     - run: kubctl set image deployment/fiap-food-api fiap-food-api-container=fiapfastfood/fiap-api:${{ github.event.pull_request.number }}
