@@ -25,7 +25,7 @@ jobs:
 
     - run: terraform -chdir=db-terraform/src apply -auto-approve
     
-    - run: echo "$(terraform -chdir=k8s-terraform/src output -raw IP)"
+    - run: echo "$(terraform -chdir=db-terraform/src output -raw IP)"
       id: URL
 
     
