@@ -89,4 +89,4 @@ jobs:
 
     - run: kubectl apply -f k8s-terraform/src/java.yaml
 
-    - run: kubectl set image deployment/fiap-food-api fiap-food-api-container=fiapfastfood/fiap-api:${{ github.event.pull_request.number }}
+    - run: kubectl set image deployment/fiap-food-api-deployment fiap-food-api-container=fiapfastfood/fiap-api:${{ github.event.pull_request.number }}
