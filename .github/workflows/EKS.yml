@@ -27,7 +27,7 @@ jobs:
 
     - run: terraform -chdir=db-terraform/src apply -auto-approve
     
-    - run: echo "$(terraform -chdir=db-terraform/src output -raw IP)"
+    - run: echo "::set-output name=db_ip_address::$(terraform -chdir=db-terraform/src output -raw IP)"
       id: URL
 
     
@@ -56,7 +56,6 @@ jobs:
 
     - run: terraform -chdir=k8s-terraform/src apply -auto-approve
     
-
     - name: Kubectl tool installer
       uses: Azure/setup-kubectl@v3
 
@@ -67,11 +66,14 @@ jobs:
     - run: kubectl get svc
 
     - run: kubectl delete secret datasource-url --ignore-not-found
-    - run: kubectl create secret generic datasource-url --from-literal=HOST=${{ secrets.SPRING_DATASOURCE_PREFIX }}${{ steps.URL.outputs.stdout }}:${{secrets.DBPORT}}/${{secrets.DBNAME}}
+    - run: kubectl create secret generic datasource-url --from-literal=HOST=${{ secrets.SPRING_DATASOURCE_PREFIX }}${{ needs.RDS.outputs.db_ip_address }}:${{secrets.DBPORT}}/${{secrets.DBNAME}}
     
     - run: kubectl delete secret datasource-username --ignore-not-found
     - run: kubectl create secret generic datasource-username --from-literal=USER=${{secrets.SPRING_DATASOURCE_USERNAME}}
-    
+
+    - run: kubectl delete secret issuer-uri --ignore-not-found
+    - run: kubectl create secret generic issuer-uri --from-literal=ISSUER=${{secrets.ISSUER_URI}}
+
     - run: kubectl delete secret datasource-password --ignore-not-found
     - run: kubectl create secret generic datasource-password --from-literal=PASSWORD=${{secrets.SPRING_DATASOURCE_PASSWORD}}
     
@@ -90,3 +92,42 @@ jobs:
     - run: kubectl apply -f k8s-terraform/src/java.yaml
 
     - run: kubectl set image deployment/fiap-food-api-deployment fiap-food-api-container=fiapfastfood/fiap-api:${{ github.event.pull_request.number }}
+
+
+  lambda:
+    needs: RDS
+    runs-on: ubuntu-latest
+
+    env:
+      COGNITO_TOKEN_ENDPOINT: ${{ secrets.COGNITO_TOKEN_ENDPOINT }}
+      CLIENT_ID: ${{ secrets.CLIENT_ID }}
+      CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
+      GRANT_TYPE: ${{ secrets.COGNITO_TOKEN_ENDPOINT }}
+      RDS_HOSTNAME: ${{ needs.RDS.outputs.db_ip_address }}
+      RDS_DB_NAME: ${{ secrets.RDS_DB_NAME }}
+      RDS_USERNAME: ${{ secrets.RDS_USERNAME }}
+      RDS_PASSWORD: ${{ secrets.RDS_PASSWORD }}
+      RDS_PORT: ${{ RDS_PORT }}
+      
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Clone lambda repository
+      run: git clone https://github.com/fiap-fast-food/lambda
+      
+    - name: Set up JDK
+      uses: actions/setup-java@v2
+      with:
+        java-version: '17'
+
+    - name: Build with Maven
+      run: mvn -B package --file lambda/pom.xml
+
+    - name: Deploy to Lambda
+      run: |
+        aws lambda update-function-code --function-name AuthenticateCustomerLambda --zip-file fileb://lambda/target/lambda-0.0.1-SNAPSHOT.jar
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }
