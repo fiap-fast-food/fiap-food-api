@@ -67,7 +67,7 @@ jobs:
     - run: kubectl get svc
 
     - run: kubectl delete secret datasource-url --ignore-not-found
-    - run: kubectl create secret generic datasource-url --from-literal=HOST=${{ steps.URL.outputs.stdout }}:${{secrets.DBPORT}}/${{secrets.DBNAME}}
+    - run: kubectl create secret generic datasource-url --from-literal=HOST=${{ secrets.SPRING_DATASOURCE_PREFIX }}${{ steps.URL.outputs.stdout }}:${{secrets.DBPORT}}/${{secrets.DBNAME}}
     
     - run: kubectl delete secret datasource-username --ignore-not-found
     - run: kubectl create secret generic datasource-username --from-literal=USER=${{secrets.SPRING_DATASOURCE_USERNAME}}
