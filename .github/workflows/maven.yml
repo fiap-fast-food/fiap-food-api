@@ -40,7 +40,7 @@ jobs:
     - name: Create-DB
       run: docker-compose up -d
 
-    - name: Build with Maven
+    - name: Build and Tests with Maven
       run: mvn -B package -Dspring.profiles.active=deploy --file pom.xml
 
     - name: Copy JAR to temporary directory
@@ -59,7 +59,7 @@ jobs:
     uses: ./.github/workflows/Docker.yml
     secrets: inherit
 
-  Deploy_EKS:
+  Deploy:
     needs: docker
     uses: ./.github/workflows/EKS.yml
     secrets: inherit
