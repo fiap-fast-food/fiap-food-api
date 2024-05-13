@@ -10,6 +10,7 @@ import org.springframework.boot.test.autoconfigure.json.AutoConfigureJsonTesters
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.math.BigDecimal;
@@ -39,7 +40,7 @@ class PaymentControllerTest {
         when(paymentService.findStatusPaymentByConfirmationCodeOrder(any())).thenReturn(getPaymentResponse());
 
         // Executar a solicitação POST com os dados válidos
-        mockMvc.perform(get("/api/v1/payment/status/{confirmationCode}", "888888888"))
+        mockMvc.perform(get("/api/v1/payment/status/{confirmationCode}", "888888888").with(SecurityMockMvcRequestPostProcessors.jwt()))
                 .andExpect(status().isOk()) // Verifica se o status da resposta é 200 OK
                 .andExpect(jsonPath("$.id").value(1));
     }

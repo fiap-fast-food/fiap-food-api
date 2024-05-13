@@ -19,6 +19,7 @@ import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDateTime;
@@ -48,7 +49,7 @@ class OrderControllerTest {
     @Test
     @DisplayName("Should return http code 400 when information is invalid")
     void should_return_http_code_400_when_information_is_invalid() throws Exception {
-        var response = mockMvc.perform(post("/api/v1/orders"))
+        var response = mockMvc.perform(post("/api/v1/orders") .with(SecurityMockMvcRequestPostProcessors.jwt()))
                 .andReturn().getResponse();
 
         Assertions.assertThat(response.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
@@ -60,7 +61,7 @@ class OrderControllerTest {
         doNothing().when(orderService).insert("88888888", List.of("teste", "teste"));
 
         // Executar a solicitação POST com os dados válidos
-        mockMvc.perform(post("/api/v1/orders")
+        mockMvc.perform(post("/api/v1/orders") .with(SecurityMockMvcRequestPostProcessors.jwt())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(orderRequestJackson.write(getOrderRequest()).getJson()))
                 .andExpect(status().isOk()); // Verificar se o status da resposta é 200 OK
@@ -73,7 +74,7 @@ class OrderControllerTest {
         when(orderService.findAll()).thenReturn(List.of(getOrderEntity()));
 
         // Executar a solicitação POST com os dados válidos
-        mockMvc.perform(get("/api/v1/orders"))
+        mockMvc.perform(get("/api/v1/orders").with(SecurityMockMvcRequestPostProcessors.jwt()))
                 .andExpect(status().isOk()); // Verifica se o status da resposta é 200 OK
     }
 
@@ -84,7 +85,7 @@ class OrderControllerTest {
         when(orderService.findByConfirmationCode(any())).thenReturn(getOrderEntity());
 
         // Executar a solicitação POST com os dados válidos
-        mockMvc.perform(get("/api/v1/orders/{confirmationCode}", "888888888"))
+        mockMvc.perform(get("/api/v1/orders/{confirmationCode}", "888888888").with(SecurityMockMvcRequestPostProcessors.jwt()))
                 .andExpect(status().isOk()); // Verifica se o status da resposta é 200 OK
     }
 
@@ -96,7 +97,7 @@ class OrderControllerTest {
         doNothing().when(orderService).updateConfirmOrder(any());
 
         // Executar a solicitação POST com os dados válidos
-        mockMvc.perform(put("/api/v1/orders/confirm/{confirmationCode}", 1L).contentType(MediaType.APPLICATION_JSON)
+        mockMvc.perform(put("/api/v1/orders/confirm/{confirmationCode}", 1L).with(SecurityMockMvcRequestPostProcessors.jwt()).contentType(MediaType.APPLICATION_JSON)
                         .content(orderRequestJackson.write(getOrderRequest()).getJson()))
                 .andExpect(status().isNoContent()); // Verifica se o status da resposta é 204 OK
     }
@@ -110,7 +111,7 @@ class OrderControllerTest {
 
 
         // Executar a solicitação POST com os dados válidos
-        mockMvc.perform(put("/api/v1/orders/status/{confirmationCode}/{statusOrder}", 1L, 1L).contentType(MediaType.APPLICATION_JSON)
+        mockMvc.perform(put("/api/v1/orders/status/{confirmationCode}/{statusOrder}", 1L, 1L).with(SecurityMockMvcRequestPostProcessors.jwt()).contentType(MediaType.APPLICATION_JSON)
                         .content(orderRequestJackson.write(getOrderRequest()).getJson()))
                 .andExpect(status().isOk()); // Verifica se o status da resposta é 204 OK
     }
