@@ -136,8 +136,8 @@ jobs:
     
     - name: Create AWS Lambda Function
       run: |
-        aws lambda create-function --function-name AuthenticateCustomerLambda --runtime java17 --handler com.fiap.lambda.AuthenticateCustomerLambda::handleRequest --zip-file fileb://lambda/target/lambda-0.0.1-SNAPSHOT.jar
+        aws lambda create-function --function-name AuthenticateCustomerLambda --runtime java17 --handler com.fiap.lambda.AuthenticateCustomerLambda::handleRequest --role arn:aws:iam::700867317784:role/lambda-ex --zip-file fileb://lambda/target/lambda-0.0.1-SNAPSHOT.jar
       continue-on-error: true  
       
     - name: Update Lambda Function    
-      run: aws lambda update-function-code --function-name AuthenticateCustomerLambda --role arn:aws:iam::700867317784:role/lambda-ex --zip-file fileb://lambda/target/lambda-0.0.1-SNAPSHOT.jar
+      run: aws lambda update-function-code --function-name AuthenticateCustomerLambda --zip-file fileb://lambda/target/lambda-0.0.1-SNAPSHOT.jar
