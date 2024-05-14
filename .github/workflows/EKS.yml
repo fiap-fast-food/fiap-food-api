@@ -95,7 +95,7 @@ jobs:
 
 
   lambda:
-#    needs: RDS
+    needs: EKS
     runs-on: ubuntu-latest
 
     env:
