@@ -14,17 +14,24 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ActiveProfiles;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
 @SpringBootTest
@@ -42,10 +49,15 @@ class CategoryControllerTest {
     @Autowired
     private CategoryMapper categoryMapper;
 
+    @MockBean
+    private JwtDecoder jwtDecoder;
+
+
     @Test
     @DisplayName("Should return http code 400 when information is invalid")
+    @WithMockUser(username = "testuser", roles = { "USER" })
     void should_return_http_code_400_when_information_is_invalid() throws Exception {
-        var response = mockMvc.perform(post("/api/v1/category"))
+        var response = mockMvc.perform(post("/api/v1/category").with(SecurityMockMvcRequestPostProcessors.jwt()))
                 .andReturn().getResponse();
 
         Assertions.assertThat(response.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
@@ -53,17 +65,21 @@ class CategoryControllerTest {
 
     @Test
     @DisplayName("Should return http code 200 when information is valid")
+    @WithMockUser(username = "testuser", roles = { "ADMIN" })
     void should_return_http_code_200_when_information_is_valid() throws Exception {
+
+
         // Criar um objeto CategoryEntity simulado
         CategoryEntity categoryEntity = new CategoryEntity();
         categoryEntity.setId(1L);
-        categoryEntity.setName("Teste");
 
         // Configurar o mock do CategoryService para retornar o objeto simulado quando chamado
         when(categoryService.insert(any())).thenReturn(categoryEntity);
 
+
         // Executar a solicitação POST com os dados válidos
         mockMvc.perform(post("/api/v1/category")
+                        .with(SecurityMockMvcRequestPostProcessors.jwt())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(categoryRequest.write(getCategoryRequest()).getJson()))
                 .andExpect(status().isOk()); // Verificar se o status da resposta é 200 OK
@@ -72,6 +88,7 @@ class CategoryControllerTest {
     @Test
     @DisplayName("Find By Id Should return http code 200 when information is valid")
     void find_by_id_should_return_http_code_200_when_information_is_valid() throws Exception {
+
         // Criar um objeto CategoryEntity simulado
         CategoryEntity categoryEntity = new CategoryEntity();
         categoryEntity.setId(1L);
@@ -81,7 +98,8 @@ class CategoryControllerTest {
         when(categoryService.find(1L)).thenReturn(categoryEntity);
 
         // Executar a solicitação POST com os dados válidos
-        mockMvc.perform(get("/api/v1/category/{id}", 1L))
+        mockMvc.perform(get("/api/v1/category/{id}", 1L)
+                        .with(SecurityMockMvcRequestPostProcessors.jwt()))
                 .andExpect(status().isOk()) // Verifica se o status da resposta é 200 OK
                 .andExpect(jsonPath("$.id").value(1));
     }
@@ -99,6 +117,7 @@ class CategoryControllerTest {
 
         // Executar a solicitação POST com os dados válidos
         mockMvc.perform(put("/api/v1/category/{id}", 1L).contentType(MediaType.APPLICATION_JSON)
+                        .with(SecurityMockMvcRequestPostProcessors.jwt())
                         .content(categoryRequest.write(getCategoryRequest()).getJson()))
                 .andExpect(status().isNoContent()); // Verifica se o status da resposta é 204 OK
     }
@@ -115,7 +134,7 @@ class CategoryControllerTest {
         doNothing().when(categoryService).delete(any());
 
         // Executar a solicitação POST com os dados válidos
-        mockMvc.perform(delete("/api/v1/category/{id}", 1L))
+        mockMvc.perform(delete("/api/v1/category/{id}", 1L).with(SecurityMockMvcRequestPostProcessors.jwt()))
                 .andExpect(status().isNoContent()); // Verifica se o status da resposta é 204 OK
     }
 

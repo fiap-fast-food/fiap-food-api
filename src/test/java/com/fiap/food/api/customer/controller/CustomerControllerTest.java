@@ -17,6 +17,7 @@ import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -46,7 +47,7 @@ class CustomerControllerTest {
     @Test
     @DisplayName("Should return http code 400 when information is invalid")
     void should_return_http_code_400_when_information_is_invalid() throws Exception {
-        var response = mockMvc.perform(post("/api/v1/customers"))
+        var response = mockMvc.perform(post("/api/v1/customers").with(SecurityMockMvcRequestPostProcessors.jwt()))
                 .andReturn().getResponse();
 
         Assertions.assertThat(response.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
@@ -59,6 +60,7 @@ class CustomerControllerTest {
 
         // Executar a solicitação POST com os dados válidos
         mockMvc.perform(post("/api/v1/customers")
+                        .with(SecurityMockMvcRequestPostProcessors.jwt())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(customerRequestJackson.write(getCustomerRequest()).getJson()))
                 .andExpect(status().isOk()); // Verificar se o status da resposta é 200 OK
@@ -71,7 +73,7 @@ class CustomerControllerTest {
         when(customerService.findByCpf(any())).thenReturn(getCustomerEntity());
 
         // Executar a solicitação POST com os dados válidos
-        mockMvc.perform(get("/api/v1/customers/identify/{cpf}", "888888888"))
+        mockMvc.perform(get("/api/v1/customers/identify/{cpf}", "888888888").with(SecurityMockMvcRequestPostProcessors.jwt()))
                 .andExpect(status().isOk()) // Verifica se o status da resposta é 200 OK
                 .andExpect(jsonPath("$.id").value(1));
     }
@@ -84,7 +86,7 @@ class CustomerControllerTest {
         when(customerService.findById(any())).thenReturn(getCustomerEntity());
 
         // Executar a solicitação POST com os dados válidos
-        mockMvc.perform(get("/api/v1/customers/{id}", 1L))
+        mockMvc.perform(get("/api/v1/customers/{id}", 1L) .with(SecurityMockMvcRequestPostProcessors.jwt()))
                 .andExpect(status().isOk()) // Verifica se o status da resposta é 200 OK
                 .andExpect(jsonPath("$.id").value(1));
     }
@@ -98,7 +100,7 @@ class CustomerControllerTest {
         doNothing().when(customerService).update(any());
 
         // Executar a solicitação POST com os dados válidos
-        mockMvc.perform(put("/api/v1/customers/{id}", 1L).contentType(MediaType.APPLICATION_JSON)
+        mockMvc.perform(put("/api/v1/customers/{id}", 1L).with(SecurityMockMvcRequestPostProcessors.jwt()).contentType(MediaType.APPLICATION_JSON)
                         .content(customerRequestJackson.write(getCustomerRequest()).getJson()))
                 .andExpect(status().isNoContent()); // Verifica se o status da resposta é 204 OK
     }
@@ -111,7 +113,7 @@ class CustomerControllerTest {
         doNothing().when(customerService).delete(any());
 
         // Executar a solicitação POST com os dados válidos
-        mockMvc.perform(delete("/api/v1/customers/{id}", 1L))
+        mockMvc.perform(delete("/api/v1/customers/{id}", 1L) .with(SecurityMockMvcRequestPostProcessors.jwt()))
                 .andExpect(status().isNoContent()); // Verifica se o status da resposta é 204 OK
     }
 

@@ -5,88 +5,139 @@ on:
 
 jobs:
 
-  RDS:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v3
+#  RDS:
+#    runs-on: ubuntu-latest
+#    steps:
+#    - uses: actions/checkout@v3
+#
+#    - name: configurando credenciais da AWS
+#      uses: aws-actions/configure-aws-credentials@v1
+#      with:
+#        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#        aws-region: us-east-2
+#
+#    - run: git clone https://github.com/fiap-fast-food/db-terraform.git
+#    - name: HashiCorp - Setup Terraform
+#      uses: hashicorp/setup-terraform@v2.0.3
+#
+#    - run: terraform -chdir=db-terraform/src init
+#
+#    - run: terraform -chdir=db-terraform/src destroy -auto-approve
+#
+#    - run: terraform -chdir=db-terraform/src apply -auto-approve
+#
+#    - run: echo "::set-output name=db_ip_address::$(terraform -chdir=db-terraform/src output -raw IP)"
+#      id: URL
+
     
+#  EKS:
+#    needs: RDS
+#    runs-on: ubuntu-latest
+#    steps:
+#    - uses: actions/checkout@v3
+#
+#    - name: configurando credenciais da AWS
+#      uses: aws-actions/configure-aws-credentials@v1
+#      with:
+#        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#        aws-region: us-east-2
+#
+#
+#    - run: git clone https://github.com/fiap-fast-food/k8s-terraform.git
+#
+#    - name: HashiCorp - Setup Terraform
+#      uses: hashicorp/setup-terraform@v2.0.3
+#
+#    - run: terraform -chdir=k8s-terraform/src init
+#
+#    - run: terraform -chdir=k8s-terraform/src destroy -auto-approve
+#
+#    - run: terraform -chdir=k8s-terraform/src apply -auto-approve
+#
+#    - name: Kubectl tool installer
+#      uses: Azure/setup-kubectl@v3
+#
+#    - run: aws sts get-caller-identity
+#
+#    - run: aws eks --region us-east-2 update-kubeconfig --name fiap-food-api-cluster
+#
+#    - run: kubectl get svc
+#
+#    - run: kubectl delete secret datasource-url --ignore-not-found
+#    - run: kubectl create secret generic datasource-url --from-literal=HOST=${{ secrets.SPRING_DATASOURCE_PREFIX }}${{ needs.RDS.outputs.db_ip_address }}:${{secrets.DBPORT}}/${{secrets.DBNAME}}
+#
+#    - run: kubectl delete secret datasource-username --ignore-not-found
+#    - run: kubectl create secret generic datasource-username --from-literal=USER=${{secrets.SPRING_DATASOURCE_USERNAME}}
+#
+#    - run: kubectl delete secret issuer-uri --ignore-not-found
+#    - run: kubectl create secret generic issuer-uri --from-literal=ISSUER=${{secrets.ISSUER_URI}}
+#
+#    - run: kubectl delete secret datasource-password --ignore-not-found
+#    - run: kubectl create secret generic datasource-password --from-literal=PASSWORD=${{secrets.SPRING_DATASOURCE_PASSWORD}}
+#
+#    - run: kubectl delete secret datasource-driver-class-name --ignore-not-found
+#    - run: kubectl create secret generic datasource-driver-class-name --from-literal=DRIVER-CLASS-NAME=${{secrets.SPRING_DATASOURCE_DRIVER_CLASS_NAME}}
+#
+#    - run: kubectl delete secret dbport --ignore-not-found
+#    - run: kubectl create secret generic dbport --from-literal=DBPORT=${{secrets.DBPORT}}
+#
+#    - run: kubectl delete secret dbname --ignore-not-found
+#    - run: kubectl create secret generic dbname --from-literal=DBNAME=${{secrets.DBNAME}}
+#
+#    - run: kubectl delete secret api-payment --ignore-not-found
+#    - run: kubectl create secret generic api-payment --from-literal=HOST-API-PAYMENT=${{secrets.API_PAYMENT_URL}}
+#
+#    - run: kubectl apply -f k8s-terraform/src/java.yaml
+#
+#    - run: kubectl set image deployment/fiap-food-api-deployment fiap-food-api-container=fiapfastfood/fiap-api:${{ github.event.pull_request.number }}
+
+
+  lambda:
+#    needs: RDS
+    runs-on: ubuntu-latest
+
+    env:
+      COGNITO_TOKEN_ENDPOINT: ${{ secrets.COGNITO_TOKEN_ENDPOINT }}
+      CLIENT_ID: ${{ secrets.CLIENT_ID }}
+      CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
+      GRANT_TYPE: ${{ secrets.COGNITO_TOKEN_ENDPOINT }}
+      RDS_HOSTNAME: ${{ needs.RDS.outputs.db_ip_address }}
+      RDS_DB_NAME: ${{ secrets.RDS_DB_NAME }}
+      RDS_USERNAME: ${{ secrets.RDS_USERNAME }}
+      RDS_PASSWORD: ${{ secrets.RDS_PASSWORD }}
+      RDS_PORT: ${{ secrets.RDS_PORT }}
+      
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Clone lambda repository
+      run: git clone https://github.com/fiap-fast-food/lambda
+      
+    - name: Set up JDK 17
+      uses: actions/setup-java@v2
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        cache: maven
+
+    - name: Build with Maven
+      run: mvn -B package --file lambda/pom.xml
+
     - name: configurando credenciais da AWS
       uses: aws-actions/configure-aws-credentials@v1
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: us-east-2
-        
-    - run: git clone https://github.com/fiap-fast-food/db-terraform.git
-    - name: HashiCorp - Setup Terraform
-      uses: hashicorp/setup-terraform@v2.0.3
+    
+    - name: Create AWS Lambda Function
+      run: |
+        aws lambda create-function --function-name AuthenticateCustomerLambda --runtime java17 --handler com.fiap.lambda.AuthenticateCustomerLambda::handleRequest --zip-file fileb://lambda/target/lambda-0.0.1-SNAPSHOT.jar
+      continue-on-error: true  
       
-    - run: terraform -chdir=db-terraform/src init
-
-    - run: terraform -chdir=db-terraform/src destroy -auto-approve
-
-    - run: terraform -chdir=db-terraform/src apply -auto-approve
-    
-    - run: echo "$(terraform -chdir=db-terraform/src output -raw IP)"
-      id: URL
-
-    
-  EKS:
-    needs: RDS
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v3
-
-    - name: configurando credenciais da AWS
-      uses: aws-actions/configure-aws-credentials@v1
-      with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: us-east-2
-
-
-    - run: git clone https://github.com/fiap-fast-food/k8s-terraform.git
-
-    - name: HashiCorp - Setup Terraform
-      uses: hashicorp/setup-terraform@v2.0.3
-      
-    - run: terraform -chdir=k8s-terraform/src init
-
-    - run: terraform -chdir=k8s-terraform/src destroy -auto-approve
-
-    - run: terraform -chdir=k8s-terraform/src apply -auto-approve
-    
-
-    - name: Kubectl tool installer
-      uses: Azure/setup-kubectl@v3
-
-    - run: aws sts get-caller-identity
-
-    - run: aws eks --region us-east-2 update-kubeconfig --name fiap-food-api-cluster
-    
-    - run: kubectl get svc
-
-    - run: kubectl delete secret datasource-url --ignore-not-found
-    - run: kubectl create secret generic datasource-url --from-literal=HOST=${{ steps.URL.outputs.stdout }}:${{secrets.DBPORT}}/${{secrets.DBNAME}}
-    
-    - run: kubectl delete secret datasource-username --ignore-not-found
-    - run: kubectl create secret generic datasource-username --from-literal=USER=${{secrets.SPRING_DATASOURCE_USERNAME}}
-    
-    - run: kubectl delete secret datasource-password --ignore-not-found
-    - run: kubectl create secret generic datasource-password --from-literal=PASSWORD=${{secrets.SPRING_DATASOURCE_PASSWORD}}
-    
-    - run: kubectl delete secret datasource-driver-class-name --ignore-not-found
-    - run: kubectl create secret generic datasource-driver-class-name --from-literal=DRIVER-CLASS-NAME=${{secrets.SPRING_DATASOURCE_DRIVER_CLASS_NAME}}
-    
-    - run: kubectl delete secret dbport --ignore-not-found
-    - run: kubectl create secret generic dbport --from-literal=DBPORT=${{secrets.DBPORT}}
-    
-    - run: kubectl delete secret dbname --ignore-not-found
-    - run: kubectl create secret generic dbname --from-literal=DBNAME=${{secrets.DBNAME}}
-    
-    - run: kubectl delete secret api-payment --ignore-not-found
-    - run: kubectl create secret generic api-payment --from-literal=HOST-API-PAYMENT=${{secrets.API_PAYMENT_URL}}
-
-    - run: kubectl apply -f k8s-terraform/src/java.yaml
-
-    - run: kubectl set image deployment/fiap-food-api-deployment fiap-food-api-container=fiapfastfood/fiap-api:${{ github.event.pull_request.number }}
+    - name: Update Lambda Function    
+      run: aws lambda update-function-code --function-name AuthenticateCustomerLambda --zip-file fileb://lambda/target/lambda-0.0.1-SNAPSHOT.jar

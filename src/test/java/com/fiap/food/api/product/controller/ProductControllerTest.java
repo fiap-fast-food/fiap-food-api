@@ -18,6 +18,7 @@ import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
@@ -51,7 +52,7 @@ class ProductControllerTest {
     @Test
     @DisplayName("Should return http code 400 when information is invalid")
     void should_return_http_code_400_when_information_is_invalid() throws Exception {
-        var response = mockMvc.perform(post("/api/v1/products"))
+        var response = mockMvc.perform(post("/api/v1/products").with(SecurityMockMvcRequestPostProcessors.jwt()))
                 .andReturn().getResponse();
 
         Assertions.assertThat(response.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
@@ -63,7 +64,7 @@ class ProductControllerTest {
         when(productService.insert(any())).thenReturn(productMapper.toEntity(getProductRequest()));
 
         // Executar a solicitação POST com os dados válidos
-        mockMvc.perform(post("/api/v1/products")
+        mockMvc.perform(post("/api/v1/products").with(SecurityMockMvcRequestPostProcessors.jwt())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(productRequestJackson.write(getProductRequest()).getJson()))
                 .andExpect(status().isOk()); // Verificar se o status da resposta é 200 OK
@@ -76,7 +77,7 @@ class ProductControllerTest {
         when(productService.findById(any())).thenReturn(productMapper.toEntity(getProductRequest()));
 
         // Executar a solicitação POST com os dados válidos
-        mockMvc.perform(get("/api/v1/products/{id}", 1L))
+        mockMvc.perform(get("/api/v1/products/{id}", 1L).with(SecurityMockMvcRequestPostProcessors.jwt()))
                 .andExpect(status().isOk()); // Verifica se o status da resposta é 200 OK
     }
 
@@ -87,7 +88,7 @@ class ProductControllerTest {
         when(productService.findByCategoryName(any())).thenReturn(List.of(productMapper.toEntity(getProductRequest())));
 
         // Executar a solicitação POST com os dados válidos
-        mockMvc.perform(get("/api/v1/products/category/{categoryName}", "Teste"))
+        mockMvc.perform(get("/api/v1/products/category/{categoryName}", "Teste").with(SecurityMockMvcRequestPostProcessors.jwt()))
                 .andExpect(status().isOk()); // Verifica se o status da resposta é 200 OK
     }
 
@@ -98,7 +99,7 @@ class ProductControllerTest {
         when(productService.findByProductName(any())).thenReturn(productMapper.toEntity(getProductRequest()));
 
         // Executar a solicitação POST com os dados válidos
-        mockMvc.perform(get("/api/v1/products/product/{productName}", "Teste"))
+        mockMvc.perform(get("/api/v1/products/product/{productName}", "Teste").with(SecurityMockMvcRequestPostProcessors.jwt()))
                 .andExpect(status().isOk()); // Verifica se o status da resposta é 200 OK
     }
 
@@ -111,7 +112,7 @@ class ProductControllerTest {
         doNothing().when(productService).update(any());
 
         // Executar a solicitação POST com os dados válidos
-        mockMvc.perform(put("/api/v1/products/{id}", 1L).contentType(MediaType.APPLICATION_JSON)
+        mockMvc.perform(put("/api/v1/products/{id}", 1L).with(SecurityMockMvcRequestPostProcessors.jwt()).contentType(MediaType.APPLICATION_JSON)
                         .content(productRequestJackson.write(getProductRequest()).getJson()))
                 .andExpect(status().isNoContent()); // Verifica se o status da resposta é 204 OK
     }
@@ -125,7 +126,7 @@ class ProductControllerTest {
         doNothing().when(productService).delete(any());
 
         // Executar a solicitação POST com os dados válidos
-        mockMvc.perform(delete("/api/v1/products/{id}", 1L))
+        mockMvc.perform(delete("/api/v1/products/{id}", 1L).with(SecurityMockMvcRequestPostProcessors.jwt()))
                 .andExpect(status().isNoContent()); // Verifica se o status da resposta é 204 OK
     }
 
