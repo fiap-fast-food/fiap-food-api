@@ -1,11 +1,9 @@
-package com.fiap.food.api.product.controller;
+package com.fiap.food.api.product.client;
 
 import com.fiap.food.api.assembler.CategoryMapper;
 import com.fiap.food.api.assembler.ProductMapper;
-import com.fiap.food.api.customer.dto.CustomerRequest;
-import com.fiap.food.api.customer.dto.CustomerResponse;
-import com.fiap.food.api.product.dto.ProductRequest;
-import com.fiap.food.api.product.dto.ProductResponse;
+import com.fiap.food.client.dto.ProductRequestClientDTO;
+import com.fiap.food.client.dto.ProductResponseClientDTO;
 import com.fiap.food.api.product.service.ProductService;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -23,7 +21,6 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
@@ -45,9 +42,9 @@ class ProductControllerTest {
     @Autowired
     private CategoryMapper categoryMapper;
     @Autowired
-    private JacksonTester<ProductRequest> productRequestJackson;
+    private JacksonTester<ProductRequestClientDTO> productRequestJackson;
     @Autowired
-    private JacksonTester<ProductResponse> productResponseJackson;
+    private JacksonTester<ProductResponseClientDTO> productResponseJackson;
 
     @Test
     @DisplayName("Should return http code 400 when information is invalid")
@@ -131,8 +128,8 @@ class ProductControllerTest {
     }
 
 
-    private ProductRequest getProductRequest() {
-        ProductRequest productRequest = new ProductRequest();
+    private ProductRequestClientDTO getProductRequest() {
+        ProductRequestClientDTO productRequest = new ProductRequestClientDTO();
         productRequest.setName("Teste");
         productRequest.setInformation("teste");
         productRequest.setPrice(1.0);

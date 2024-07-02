@@ -8,7 +8,7 @@ import com.fiap.food.api.assembler.ProductMapper;
 import com.fiap.food.api.customer.service.CustomerService;
 import com.fiap.food.api.order.dto.OrderRequest;
 import com.fiap.food.api.payment.dto.PaymentRequest;
-import com.fiap.food.api.product.dto.ProductRequest;
+import com.fiap.food.client.dto.ProductRequestClientDTO;
 import com.fiap.food.api.product.service.ProductService;
 import com.fiap.food.client.service.PaymentClientService;
 import com.fiap.food.core.exception.NotFoundException;
@@ -72,7 +72,7 @@ class OrderServiceImplTest extends AplicationConfigTest {
         Mockito.when(productService.findByProductName(any())).thenReturn(productEntity);
 
         // Mock para o mapper que converte de ProductEntity para ProductRequest
-        ProductRequest productRequest = new ProductRequest();
+        ProductRequestClientDTO productRequest = new ProductRequestClientDTO();
         productRequest.setPrice(productEntity.getPrice()); // Assegura que a conversão mantenha o preço
         Mockito.when(productMapper.toRequest(any(ProductEntity.class))).thenReturn(productRequest);
 
@@ -138,8 +138,8 @@ class OrderServiceImplTest extends AplicationConfigTest {
         return orderEntity;
     }
 
-    private List<ProductRequest> getProductList() {
-        List<ProductRequest> list = new ArrayList<>();
+    private List<ProductRequestClientDTO> getProductList() {
+        List<ProductRequestClientDTO> list = new ArrayList<>();
         list.add(getProductRequest());
         return list;
     }
@@ -173,8 +173,8 @@ class OrderServiceImplTest extends AplicationConfigTest {
 
         return productEntity;
     }
-    private ProductRequest getProductRequest() {
-        ProductRequest productRequest = new ProductRequest();
+    private ProductRequestClientDTO getProductRequest() {
+        ProductRequestClientDTO productRequest = new ProductRequestClientDTO();
         productRequest.setName("Teste");
         productRequest.setInformation("teste");
         productRequest.setPrice(1.0);
