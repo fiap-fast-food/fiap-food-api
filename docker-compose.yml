@@ -1,4 +1,4 @@
-version: "2.4"
+version: "3.8"
 
 services:
   postgres:
@@ -7,15 +7,52 @@ services:
       - POSTGRES_DB=fiap-fastfood
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=root
-    command: postgres
     ports:
       - "5432:5432"
-      
-      
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+  mongo-product:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-product-data:/data/db
+
   web:
-    build: .
+    build: ./fiap-food-api
     restart: unless-stopped
     ports:
-      - "8080:8080"  
-    links:
-     - postgres
+      - "8080:8080"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/fiap-fastfood
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=root
+      - MONGO_PRODUCT_URL=mongodb://mongo-product:27017/products
+    depends_on:
+      - postgres
+      - mongo-product
+
+  pagamento-service:
+    build: ./fiap-food-payment
+    ports:
+      - "8082:8080"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/fiap-fastfood
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=root
+    depends_on:
+      - postgres
+
+  producao-service:
+    build: ./fiap-food-production
+    ports:
+      - "8083:8080"
+    environment:
+      - MONGO_DB_URL=mongodb://mongo-product:27017/products
+    depends_on:
+      - mongo-product
+
+volumes:
+  postgres-data:
+  mongo-product-data:

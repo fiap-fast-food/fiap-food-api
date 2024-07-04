@@ -4,7 +4,7 @@ import com.fiap.food.api.AplicationConfigTest;
 import com.fiap.food.api.assembler.CategoryMapper;
 import com.fiap.food.api.assembler.ProductMapper;
 import com.fiap.food.api.category.service.CategoryService;
-import com.fiap.food.api.product.dto.ProductRequest;
+import com.fiap.food.client.dto.ProductRequestClientDTO;
 import com.fiap.food.core.exception.NotFoundException;
 import com.fiap.food.core.model.CategoryEntity;
 import com.fiap.food.core.model.ProductEntity;
@@ -106,8 +106,8 @@ class ProductServiceImplTest extends AplicationConfigTest {
         category.setId(1L);
         return category;
     }
-    private ProductRequest getProductRequest() {
-        ProductRequest productRequest = new ProductRequest();
+    private ProductRequestClientDTO getProductRequest() {
+        ProductRequestClientDTO productRequest = new ProductRequestClientDTO();
         productRequest.setName("Teste");
         productRequest.setInformation("teste");
         productRequest.setPrice(1.0);
