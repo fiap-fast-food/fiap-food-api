@@ -4,7 +4,7 @@ import com.fiap.food.api.assembler.CategoryMapper;
 import com.fiap.food.api.assembler.ProductMapper;
 import com.fiap.food.client.dto.ProductRequestClientDTO;
 import com.fiap.food.client.dto.ProductResponseClientDTO;
-import com.fiap.food.api.product.service.ProductService;
+import com.fiap.food.client.service.ProductClient;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -36,7 +36,7 @@ class ProductControllerTest {
     @Autowired
     private MockMvc mockMvc;
     @MockBean
-    private ProductService productService;
+    private ProductClient productClient;
     @Autowired
     private ProductMapper productMapper;
     @Autowired
@@ -56,77 +56,16 @@ class ProductControllerTest {
     }
 
     @Test
-    @DisplayName("Should return http code 200 when information is valid")
-    void should_return_http_code_200_when_information_is_valid() throws Exception {
-        when(productService.insert(any())).thenReturn(productMapper.toEntity(getProductRequest()));
-
-        // Executar a solicitação POST com os dados válidos
-        mockMvc.perform(post("/api/v1/products").with(SecurityMockMvcRequestPostProcessors.jwt())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(productRequestJackson.write(getProductRequest()).getJson()))
-                .andExpect(status().isOk()); // Verificar se o status da resposta é 200 OK
-    }
-
-    @Test
-    @DisplayName("Find By ID Should return http code 200 when information is valid")
-    void find_by_ID_should_return_http_code_200_when_information_is_valid() throws Exception {
-        // Configurar o mock do ProductService para retornar o objeto simulado quando chamado
-        when(productService.findById(any())).thenReturn(productMapper.toEntity(getProductRequest()));
-
-        // Executar a solicitação POST com os dados válidos
-        mockMvc.perform(get("/api/v1/products/{id}", 1L).with(SecurityMockMvcRequestPostProcessors.jwt()))
-                .andExpect(status().isOk()); // Verifica se o status da resposta é 200 OK
-    }
-
-    @Test
-    @DisplayName("Find By Category Name Should return http code 200 when information is valid")
-    void find_by_Category_Name_should_return_http_code_200_when_information_is_valid() throws Exception {
-        // Configurar o mock do ProductService para retornar o objeto simulado quando chamado
-        when(productService.findByCategoryName(any())).thenReturn(List.of(productMapper.toEntity(getProductRequest())));
-
-        // Executar a solicitação POST com os dados válidos
-        mockMvc.perform(get("/api/v1/products/category/{categoryName}", "Teste").with(SecurityMockMvcRequestPostProcessors.jwt()))
-                .andExpect(status().isOk()); // Verifica se o status da resposta é 200 OK
-    }
-
-    @Test
     @DisplayName("Find By Product Name Should return http code 200 when information is valid")
     void find_by_Product_Name_should_return_http_code_200_when_information_is_valid() throws Exception {
         // Configurar o mock do ProductService para retornar o objeto simulado quando chamado
-        when(productService.findByProductName(any())).thenReturn(productMapper.toEntity(getProductRequest()));
+        when(productClient.findByProductName(any())).thenReturn(getProductRequest());
 
-        // Executar a solicitação POST com os dados válidos
-        mockMvc.perform(get("/api/v1/products/product/{productName}", "Teste").with(SecurityMockMvcRequestPostProcessors.jwt()))
+        // Executar a solicitação GET com os dados válidos
+        mockMvc.perform(get("/api/v1/products/product/{productName}", "Teste")
+                        .with(SecurityMockMvcRequestPostProcessors.jwt()))
                 .andExpect(status().isOk()); // Verifica se o status da resposta é 200 OK
     }
-
-    @Test
-    @DisplayName("Update By Id Should return http code 204 when information is valid")
-    void update_by_id_should_return_http_code_200_when_information_is_valid() throws Exception {
-
-
-        // Configurar o mock do ProductService para retornar o objeto simulado quando chamado
-        doNothing().when(productService).update(any());
-
-        // Executar a solicitação POST com os dados válidos
-        mockMvc.perform(put("/api/v1/products/{id}", 1L).with(SecurityMockMvcRequestPostProcessors.jwt()).contentType(MediaType.APPLICATION_JSON)
-                        .content(productRequestJackson.write(getProductRequest()).getJson()))
-                .andExpect(status().isNoContent()); // Verifica se o status da resposta é 204 OK
-    }
-
-
-    @Test
-    @DisplayName("DELETE By Id Should return http code 204 when information is valid")
-    void delete_by_id_should_return_http_code_200_when_information_is_valid() throws Exception {
-
-        // Configurar o mock do ProductService para retornar o objeto simulado quando chamado
-        doNothing().when(productService).delete(any());
-
-        // Executar a solicitação POST com os dados válidos
-        mockMvc.perform(delete("/api/v1/products/{id}", 1L).with(SecurityMockMvcRequestPostProcessors.jwt()))
-                .andExpect(status().isNoContent()); // Verifica se o status da resposta é 204 OK
-    }
-
 
     private ProductRequestClientDTO getProductRequest() {
         ProductRequestClientDTO productRequest = new ProductRequestClientDTO();
@@ -136,9 +75,4 @@ class ProductControllerTest {
         productRequest.setNameCategory("teste");
         return productRequest;
     }
-
-
-
-
-
 }

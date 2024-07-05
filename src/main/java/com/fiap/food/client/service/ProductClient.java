@@ -10,7 +10,6 @@ import org.springframework.web.client.RestTemplate;
 
 @Service
 public class ProductClient {
-
     @Autowired
     private RestTemplate restTemplate;
 
