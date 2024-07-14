@@ -4,8 +4,29 @@
 API web de lanchonete de autoatendimento de fast food, que tem como objetivo, garantir que a lanchonete possa atender os clientes de maneira eficiente, gerenciando os pedidos de forna adequada.
 
 
-# Entregável fase 02
-### Para essa fase 02 do projeto, estamos implementando os seguintes desafios:
+# Entregável fase 04
+
+Nesta fase vamos continuar trabalhando no projeto existente, e dando continuidade ao desenvolvimento do software para a lanchonete, teremos as seguintes melhorias e alterações:
+
+1. Refatore o projeto separando em ao menos 3 (três) microsserviços. Alguns exemplos de serviços:
+    - **Pedido**: responsável por operacionalizar o processo de pedidos, registrando os pedidos, retornando as informações necessárias para montar um pedido, listando os pedidos registrados e em processo de produção (visão de cliente).
+    - **Pagamento**: responsável por operacionalizar a cobrança de um pedido, registrando a solicitação de pagamento, recebendo o retorno do processador de pagamento e atualizando o status do pedido.
+    - **Produção**: responsável por operacionalizar o processo de produção do pedido, acompanhando a fila de pedidos (visão da cozinha), atualização de status de cada passo do pedido.
+
+   Lembre-se de trabalhar com bancos de dados para cada aplicação. Use ao menos um banco de dados NoSQL e um SQL; caso queira fazer com mais bancos, você pode decidir quais utilizar.
+
+   Os serviços devem se comunicar entre si, seja por chamada direta, mensagens em fila ou estratégias semelhantes. Um serviço não pode acessar o banco de dados de outro serviço, porque viola as regras de implementação de microsserviços.
+
+2. Ao refatorar, os microsserviços devem conter testes unitários.
+    - Ao menos um dos caminhos de teste deve implementar BDD.
+    - Em todos os projetos, a cobertura de teste deve ser de 80%.
+
+3. Seus repositórios devem ser separados para cada aplicação e devem respeitar as seguintes regras:
+    - Main protegida.
+    - PR para branch main, que deve validar o build da aplicação, e a qualidade de código via sonarqube ou qualquer outro serviço semelhante.
+    - Automatize o deploy de todos seus microsserviços.
+
+### Para essa fase 04 do projeto, estamos implementando os seguintes desafios:
 
 
 ### API - Requisitos Funcionais

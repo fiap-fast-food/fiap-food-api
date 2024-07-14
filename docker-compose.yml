@@ -20,7 +20,9 @@ services:
       - mongo-product-data:/data/db
 
   web:
-    build: ./fiap-food-api
+    build:
+      context: .
+      dockerfile: Dockerfile-web
     restart: unless-stopped
     ports:
       - "8080:8080"
@@ -33,19 +35,34 @@ services:
       - postgres
       - mongo-product
 
-  pagamento-service:
-    build: ./fiap-food-payment
+  postgres-payment:
+    image: postgres:14.4
+    environment:
+      - POSTGRES_DB=fiap-fastfood-payment
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=root
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres-payment-data:/var/lib/postgresql/data
+
+  payment-service:
+    build:
+      context: .
+      dockerfile: Dockerfile-payment
     ports:
       - "8082:8080"
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/fiap-fastfood
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-payment:5433/fiap-fastfood-payment
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=root
     depends_on:
-      - postgres
+      - postgres-payment
 
   producao-service:
-    build: ./fiap-food-production
+    build:
+      context: .
+      dockerfile: Dockerfile-production
     ports:
       - "8083:8080"
     environment:
@@ -56,3 +73,4 @@ services:
 volumes:
   postgres-data:
   mongo-product-data:
+  postgres-payment-data:
