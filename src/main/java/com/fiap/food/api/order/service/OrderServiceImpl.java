@@ -7,10 +7,10 @@ import com.fiap.food.api.assembler.ProductMapper;
 import com.fiap.food.api.customer.service.CustomerService;
 import com.fiap.food.api.order.dto.OrderRequest;
 import com.fiap.food.api.payment.dto.PaymentRequest;
-import com.fiap.food.api.product.dto.ProductRequest;
-import com.fiap.food.api.product.service.ProductService;
 import com.fiap.food.client.dto.PaymentRequestClientDTO;
+import com.fiap.food.client.dto.ProductRequestClientDTO;
 import com.fiap.food.client.service.PaymentClientService;
+import com.fiap.food.client.service.ProductClient;
 import com.fiap.food.core.exception.NotFoundException;
 import com.fiap.food.core.model.OrderEntity;
 import com.fiap.food.core.model.PaymentEntity;
@@ -29,22 +29,15 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-public class OrderServiceImpl implements OrderService{
+public class OrderServiceImpl implements OrderService {
 
     private final OrderRepository orderRepository;
-
     private final OrderMapper orderEntityMapper;
-
-    private final ProductService productService;
-
+    private final ProductClient productClient;
     private final CustomerService customerService;
-
     private final CustomerMapper customerMapper;
-
     private final PaymentMapper paymentEntityMapper;
-
     private final ProductMapper productMapper;
-
     private final PaymentClientService paymentClientService;
 
     @Override
@@ -79,7 +72,6 @@ public class OrderServiceImpl implements OrderService{
     }
 
     private void vincularCliente(String cpfCustomer, OrderRequest order) throws NotFoundException {
-        // Customer
         if (!Objects.isNull(cpfCustomer) && !cpfCustomer.isBlank()) {
             var customer = customerService.findByCpf(cpfCustomer);
             order.setCustomer(customerMapper.toRequest(customer));
@@ -87,27 +79,23 @@ public class OrderServiceImpl implements OrderService{
     }
 
     private void processaProdutos(List<String> productsName, OrderRequest order) {
-        // Product
-        List<ProductRequest> products = new ArrayList<>();
-
+        List<ProductRequestClientDTO> products = new ArrayList<>();
         productsName.forEach(productName -> {
             try {
-                var byProductName = productService.findByProductName(productName);
+                var byProductName = productClient.findByProductName(productName);
                 products.add(productMapper.toRequest(byProductName));
             } catch (NotFoundException e) {
                 throw new RuntimeException(e);
             }
         });
-
-        // Associando a lista de produtos à pedido
         order.setProducts(products);
     }
 
     private PaymentRequest processaPagamento(OrderRequest order) throws NotFoundException {
         var payment = new PaymentRequest();
         var totalSumOrderAmount = order.getProducts().stream()
-                        .mapToDouble(ProductRequest::getPrice)
-                                .sum();
+                .mapToDouble(ProductRequestClientDTO::getPrice)
+                .sum();
 
         PaymentRequestClientDTO paymentRequestClientDTO = new PaymentRequestClientDTO();
         paymentRequestClientDTO.setTimestamp(LocalDateTime.now());

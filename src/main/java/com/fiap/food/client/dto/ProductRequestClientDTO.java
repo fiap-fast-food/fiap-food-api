@@ -1,12 +1,11 @@
-package com.fiap.food.api.product.dto;
+package com.fiap.food.client.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
 import lombok.Data;
 
 @Data
-public class ProductRequest {
-
+public class ProductRequestClientDTO {
     @NotBlank
     private String name;
     @Positive(message = "O preco deve ser maior que zero")

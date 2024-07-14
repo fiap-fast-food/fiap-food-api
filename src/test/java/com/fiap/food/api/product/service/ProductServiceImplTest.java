@@ -4,7 +4,8 @@ import com.fiap.food.api.AplicationConfigTest;
 import com.fiap.food.api.assembler.CategoryMapper;
 import com.fiap.food.api.assembler.ProductMapper;
 import com.fiap.food.api.category.service.CategoryService;
-import com.fiap.food.api.product.dto.ProductRequest;
+import com.fiap.food.client.dto.ProductRequestClientDTO;
+import com.fiap.food.client.service.ProductClient;
 import com.fiap.food.core.exception.NotFoundException;
 import com.fiap.food.core.model.CategoryEntity;
 import com.fiap.food.core.model.ProductEntity;
@@ -35,55 +36,15 @@ class ProductServiceImplTest extends AplicationConfigTest {
     private CategoryMapper categoryMapper;
 
     @Autowired
-    private ProductService productService;
-
-    @Test
-    @DisplayName("mustSaveProduct")
-    public void mustSaveProduct() throws NotFoundException {
-        Mockito.when(productMapper.toEntity(any())).thenReturn(getProductEntity());
-        Mockito.when(categoryService.find(anyString())).thenReturn(getCategory());
-        productService.insert(getProductRequest());
-        Mockito.verify(productRepository, Mockito.times(1)).save(any(ProductEntity.class));
-    }
-
-    @Test
-    @DisplayName("mustDeleteByIdProduct")
-    public void mustDeleteByIdProduct() throws NotFoundException {
-        productService.delete(1L);
-        Mockito.verify(productRepository, Mockito.times(1)).deleteById(ArgumentMatchers.any());
-    }
-
-    @Test
-    @DisplayName("mustUpdateProduct")
-    public void mustUpdateCustomer() throws NotFoundException {
-        productService.update(getProductEntity());
-        Mockito.verify(productRepository, Mockito.times(1)).save(any(ProductEntity.class));
-    }
-
-    @Test
-    @DisplayName("mustFindByCategoryNameProduct")
-    public void mustFindByCategoryNameProduct() throws NotFoundException {
-        Mockito.when(productService.findByCategoryName(any())).thenReturn(getListProductEntity());
-        productService.findByCategoryName("888888888");
-        Mockito.verify(productRepository, Mockito.times(1)).findByCategoryName(ArgumentMatchers.any());
-    }
+    private ProductClient productClient;
 
     @Test
     @DisplayName("mustFindByProductNameProduct")
     public void mustFindByProductNameProduct() throws NotFoundException {
         Mockito.when(productRepository.findByName(any())).thenReturn(Optional.of(getProductEntity()));
-        productService.findByProductName("888888888");
+        productClient.findByProductName("888888888");
         Mockito.verify(productRepository, Mockito.times(1)).findByName(ArgumentMatchers.any());
     }
-
-    @Test
-    @DisplayName("mustFindByIdProduct")
-    public void mustFindByIdProduct() throws NotFoundException {
-        Mockito.when(productRepository.findById(any())).thenReturn(Optional.of(getProductEntity()));
-        productService.findById(1L);
-        Mockito.verify(productRepository, Mockito.times(1)).findById(ArgumentMatchers.any());
-    }
-
 
     private List<ProductEntity> getListProductEntity() {
         return List.of(getProductEntity());
@@ -106,8 +67,8 @@ class ProductServiceImplTest extends AplicationConfigTest {
         category.setId(1L);
         return category;
     }
-    private ProductRequest getProductRequest() {
-        ProductRequest productRequest = new ProductRequest();
+    private ProductRequestClientDTO getProductRequest() {
+        ProductRequestClientDTO productRequest = new ProductRequestClientDTO();
         productRequest.setName("Teste");
         productRequest.setInformation("teste");
         productRequest.setPrice(1.0);

@@ -1,7 +1,7 @@
 package com.fiap.food.api.assembler;
 
-import com.fiap.food.api.product.dto.ProductRequest;
-import com.fiap.food.api.product.dto.ProductResponse;
+import com.fiap.food.client.dto.ProductRequestClientDTO;
+import com.fiap.food.client.dto.ProductResponseClientDTO;
 import com.fiap.food.core.model.ProductEntity;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.PropertyMap;
@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class ProductMapper {
     private final ModelMapper modelMapper;
-    PropertyMap<ProductRequest, ProductEntity> skipModifiedFieldsMap = new PropertyMap<>() {
+    PropertyMap<ProductRequestClientDTO, ProductEntity> skipModifiedFieldsMap = new PropertyMap<>() {
         protected void configure() {
             // TODO document why this method is empty
         }
@@ -19,17 +19,17 @@ public class ProductMapper {
         this.modelMapper = modelMapper;
         this.modelMapper.addMappings(skipModifiedFieldsMap);
     }
-    public ProductEntity toEntity(ProductRequest request) {
+    public ProductEntity toEntity(ProductRequestClientDTO request) {
 
         return modelMapper.map(request, ProductEntity.class);
     }
 
-    public ProductRequest toRequest(ProductEntity request) {
+    public ProductRequestClientDTO toRequest(ProductRequestClientDTO request) {
 
-        return modelMapper.map(request, ProductRequest.class);
+        return modelMapper.map(request, ProductRequestClientDTO.class);
     }
-    public ProductResponse toOutput(ProductEntity productEntity) {
+    public ProductResponseClientDTO toOutput(ProductEntity productEntity) {
 
-        return modelMapper.map(productEntity, ProductResponse.class);
+        return modelMapper.map(productEntity, ProductResponseClientDTO.class);
     }
 }
