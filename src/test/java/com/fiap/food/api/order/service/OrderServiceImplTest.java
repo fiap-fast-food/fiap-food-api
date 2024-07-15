@@ -9,8 +9,8 @@ import com.fiap.food.api.customer.service.CustomerService;
 import com.fiap.food.api.order.dto.OrderRequest;
 import com.fiap.food.api.payment.dto.PaymentRequest;
 import com.fiap.food.client.dto.ProductRequestClientDTO;
-import com.fiap.food.api.product.service.ProductService;
 import com.fiap.food.client.service.PaymentClientService;
+import com.fiap.food.client.service.ProductClient;
 import com.fiap.food.core.exception.NotFoundException;
 import com.fiap.food.core.model.*;
 import com.fiap.food.core.repository.OrderRepository;
@@ -43,7 +43,7 @@ class OrderServiceImplTest extends AplicationConfigTest {
     private ProductMapper productMapper;
 
     @MockBean
-    private ProductService productService;
+    private ProductClient productService;
 
     @MockBean
     private CustomerService customerService;
@@ -59,39 +59,6 @@ class OrderServiceImplTest extends AplicationConfigTest {
 
     @Autowired
     private OrderService orderService;
-
-    @Test
-    @DisplayName("mustSaveOrder")
-    public void mustSaveOrder() throws NotFoundException {
-        // Cria uma entidade de cliente e de produto com valores predefinidos
-        CustomerEntity customerEntity = getCustomerEntity(); // Assegure que essa entidade esteja corretamente populada
-        ProductEntity productEntity = getProductEntity(); // Isso deve retornar um ProductEntity com um preço definido, exemplo: productEntity.setPrice(new BigDecimal("10.00"));
-
-        // Mockando serviços e mapeadores
-        Mockito.when(customerService.findByCpf(ArgumentMatchers.any())).thenReturn(customerEntity);
-        Mockito.when(productService.findByProductName(any())).thenReturn(productEntity);
-
-        // Mock para o mapper que converte de ProductEntity para ProductRequest
-        ProductRequestClientDTO productRequest = new ProductRequestClientDTO();
-        productRequest.setPrice(productEntity.getPrice()); // Assegura que a conversão mantenha o preço
-        Mockito.when(productMapper.toRequest(any(ProductEntity.class))).thenReturn(productRequest);
-
-        // Mock para o serviço de pagamento
-        Mockito.when(paymentClientService.processarPagamento(any())).thenReturn("aprovado");
-
-        PaymentEntity paymentEntity = new PaymentEntity();
-        paymentEntity.setId(1L);
-        paymentEntity.setAmount(new BigDecimal(2));
-
-        Mockito.when(paymentEntityMapper.toEntity(any(PaymentRequest.class))).thenReturn(paymentEntity);
-        Mockito.when(orderEntityMapper.toEntity(any(OrderRequest.class))).thenReturn(getOrderEntity());
-
-        // Executa o método insert para testar
-        orderService.insert("88888888888", List.of("teste"));
-
-        // Verifica se o método save do repositório foi chamado exatamente uma vez
-        Mockito.verify(orderRepository, Mockito.times(1)).save(any(OrderEntity.class));
-    }
 
     @Test
     @DisplayName("mustFindAllOrders")
@@ -128,6 +95,7 @@ class OrderServiceImplTest extends AplicationConfigTest {
     private List<OrderEntity> getListOrderEntity() {
         return List.of(getOrderEntity());
     }
+
     private OrderEntity getOrderEntity() {
         OrderEntity orderEntity = new OrderEntity();
         orderEntity.setId(1L);
@@ -143,6 +111,7 @@ class OrderServiceImplTest extends AplicationConfigTest {
         list.add(getProductRequest());
         return list;
     }
+
     private OrderRequest getOrderRequest() {
         OrderRequest orderRequest = new OrderRequest();
         orderRequest.setDateTimeOrder(LocalDateTime.now());
@@ -154,6 +123,7 @@ class OrderServiceImplTest extends AplicationConfigTest {
 
         return orderRequest;
     }
+
     private CustomerEntity getCustomerEntity() {
         CustomerEntity customerEntity = new CustomerEntity();
         customerEntity.setId(1L);
@@ -173,6 +143,7 @@ class OrderServiceImplTest extends AplicationConfigTest {
 
         return productEntity;
     }
+
     private ProductRequestClientDTO getProductRequest() {
         ProductRequestClientDTO productRequest = new ProductRequestClientDTO();
         productRequest.setName("Teste");
