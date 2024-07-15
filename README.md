@@ -37,6 +37,9 @@ Nesta fase vamos continuar trabalhando no projeto existente, e dando continuidad
 * Endpoint para retorno dos pedidos seguindo as seguintes regras: Pronto > Em Preparação > Recebido.<br>
 * Endpoint para atualizar o status do pedido.
 
+### Desenho da nova Arquitetura
+<img src="src/main/resources/assets/arquitetura04.webp">
+
 ### Arquitetura em Kubernetes
 * Escalabilidade com aumento e diminuição de Pods conforme demanda.
 
